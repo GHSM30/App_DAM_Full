@@ -1,0 +1,63 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog
+        id="EditUserDialog"
+        title="Editar Usuario"
+        icon="sap-icon://edit"
+        type="Message"
+        class="customDialogSize"
+        draggable="true"
+        resizable="true"
+    >
+        <VBox id="EditUserDialogVbox" class="sapUiSmallMargin">
+            <Input id="inputEditUserId" value="{editUser>/USERID}" editable="false" placeholder="ID de Usuario"/>
+
+            <Input id="inputEditUsername" value="{editUser>/USERNAME}" placeholder="Nombre Completo"/>
+
+            <Input id="inputEditUserPhoneNumber" value="{editUser>/PHONENUMBER}" type="Number" placeholder="Número telefónico"/>
+
+            <Input id="inputEditUserEmail" value="{editUser>/EMAIL}" type="Email" placeholder="Correo Electrónico"/>
+
+            <DatePicker id="inputEditUserBirthdayDate"  valueFormat="yyyy-MM-dd" displayFormat="dd.MM.yyyy" value="{editUser>/BIRTHDAYDATE}" placeholder="Fecha de nacimiento"/>
+
+            <ComboBox id="comboBoxEditCompanies" 
+                selectedKey="{editUser>/COMPANYID}" 
+                items="{companiesModel>/value}" 
+                placeholder="Compañía"
+                selectionChange="onEditCompanySelected">
+                <core:Item key="{companiesModel>VALUEID}" text="{companiesModel>VALUE}" />
+            </ComboBox>
+
+            <ComboBox id="comboBoxEditCedis" 
+                selectedKey="{editUser>/DEPARTMENT_ID}"
+                items="{
+                    path: 'deptosModel>/value',
+                    templateShareable: false
+                }"
+                placeholder="Departamento">
+                <core:Item key="{deptosModel>VALUEID}" text="{deptosModel>VALUE}" />
+            </ComboBox>
+
+            <ComboBox id="comboBoxEditRoles" items="{rolesModel>/roles}" placeholder="Selecciona un Rol" selectionChange=".onEditRoleSelected">
+                <core:Item key="{rolesModel>ROLEID}" text="{rolesModel>ROLENAME}" />
+            </ComboBox>
+
+            
+            <VBox id="selectedEditRolesVBox" class="sapUiSmallMarginTop">
+                <!--VBOx donde va añadiendo los roles -->
+            </VBox>
+
+            <Input id="inputEditUserFunction" 
+                value="{editUser>/FUNCTION}" 
+                placeholder="Función que ejerce"/>
+
+        </VBox>
+
+        <beginButton>
+            <Button id="EditUser" text="Guardar" type="Emphasized" press="onEditSaveUser" />
+        </beginButton>
+
+        <endButton>
+            <Button id="CancelEditUser" text="Cancelar" press="onEditCancelUser" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

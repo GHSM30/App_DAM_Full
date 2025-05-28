@@ -34,7 +34,7 @@ sap.ui.define([
 
     loadCatalog: async function (labelId, modelName) {
       try {
-        const res = await fetch(`http://localhost:4004/api/sec/catalogsR?procedure=get&type=bylabelid&labelid=${labelId}`);
+        const res = await fetch(`http://localhost:3020/api/sec/catalogsR?procedure=get&type=bylabelid&labelid=${labelId}`);
         const data = await res.json();
         const values = data.value?.[0]?.VALUES || [];
         this.getView().setModel(new JSONModel({ values }), modelName);
@@ -122,7 +122,7 @@ sap.ui.define([
         emphasizedAction: MessageBox.Action.YES,
         confirmAction: MessageBox.Action.YES,
         method: "POST",
-        url: "http://localhost:4004/api/sec/rolesCRUD?procedure=delete&type=logic&roleid=",
+        url: "http://localhost:3020/api/sec/rolesCRUD?procedure=delete&type=logic&roleid=",
         successMessage: "Rol desactivado correctamente."
       });
     },
@@ -136,7 +136,7 @@ sap.ui.define([
         emphasizedAction: MessageBox.Action.DELETE,
         confirmAction: MessageBox.Action.DELETE,
         method: "POST",
-        url: "http://localhost:4004/api/sec/rolesCRUD?procedure=delete&type=hard&roleid=",
+        url: "http://localhost:3020/api/sec/rolesCRUD?procedure=delete&type=hard&roleid=",
         successMessage: "Rol eliminado permanentemente."
       });
     },
@@ -152,7 +152,7 @@ sap.ui.define([
       const sOldRoleId = oData.OLD_ROLEID || oData.ROLEID;
 
       try {
-        const response = await fetch(`http://localhost:4004/api/sec/rolesCRUD?procedure=put&roleid=${encodeURIComponent(sOldRoleId)}`, {
+        const response = await fetch(`http://localhost:3020/api/sec/rolesCRUD?procedure=put&roleid=${encodeURIComponent(sOldRoleId)}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

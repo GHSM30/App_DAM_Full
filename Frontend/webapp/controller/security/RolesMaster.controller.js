@@ -114,7 +114,7 @@ sap.ui.define([
       }
 
       try {
-        const response = await fetch("http://localhost:4004/api/sec/rolesCRUD?procedure=post", {
+        const response = await fetch("http://localhost:3020/api/sec/rolesCRUD?procedure=post", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -173,7 +173,7 @@ sap.ui.define([
 
     loadRolesData: async function () {
       try {
-        const response = await fetch("http://localhost:4004/api/sec/rolesCRUD?procedure=get&type=all", {
+        const response = await fetch("http://localhost:3020/api/sec/rolesCRUD?procedure=get&type=all", {
           method: "POST"
         });
         const data = await response.json();
@@ -208,7 +208,7 @@ sap.ui.define([
 
     loadCatalog: async function (labelId, modelName) {
       try {
-        const response = await fetch(`http://localhost:4004/api/sec/catalogsR?procedure=get&type=bylabelid&&labelid=${labelId}`);
+        const response = await fetch(`http://localhost:3020/api/sec/catalogsR?procedure=get&type=bylabelid&&labelid=${labelId}`);
         const data = await response.json();
         const values = data.value?.[0]?.VALUES || [];
         this.getView().setModel(new JSONModel({ values }), modelName);
@@ -237,7 +237,7 @@ sap.ui.define([
       const sId = encodeURIComponent(oRole.ROLEID);
 
       try {
-        const res = await fetch(`http://localhost:4004/api/sec/rolesCRUD?procedure=get&type=all&roleid=${sId}`, {
+        const res = await fetch(`http://localhost:3020/api/sec/rolesCRUD?procedure=get&type=all&roleid=${sId}`, {
           method: "POST"
         });
         const result = await res.json();

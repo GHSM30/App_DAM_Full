@@ -10,11 +10,11 @@ sap.ui.define([
     "sap/ui/core/Fragment",
     "sap/m/MessageToast",
     "sap/m/MessageBox"
-], function(BaseController,JSONModel,Log,Fragment,MessageToast,MessageBox){
+], function (BaseController, JSONModel, Log, Fragment, MessageToast, MessageBox) {
     "use strict";
 
-    return BaseController.extend("com.invertions.sapfiorimodinv.controller.security.UsersList",{
-        onInit: function(){
+    return BaseController.extend("com.invertions.sapfiorimodinv.controller.security.UsersList", {
+        onInit: function () {
 
             // Esto desactiva los botones cuando entras a la vista, hasta que selecciones un usuario en la tabla se activan
             var oViewModel = new JSONModel({
@@ -39,7 +39,7 @@ sap.ui.define([
             // Cambiar esto segun su backend
             fetch("env.json")
                 .then(res => res.json())
-                .then(env => fetch(env.API_USERS_URL_BASE + "getallusers"))
+                .then(env => fetch(env.API_USERS_URL_BASE + "GetAllUsers"))
                 .then(res => res.json())
                 .then(data => {
                     data.value.forEach(user => {
@@ -49,20 +49,48 @@ sap.ui.define([
                     oTable.setModel(oModel);
                 })
                 .catch(err => {
-                    if(err.message === ("Cannot read properties of undefined (reading 'setModel')")){
+                    if (err.message === ("Cannot read properties of undefined (reading 'setModel')")) {
                         return;
-                    }else{
+                    } else {
                         MessageToast.show("Error al cargar usuarios: " + err.message);
-                    }      
-                });        
+                    }
+                });
         },
 
-        loadCompanies: function() {
+        loadCompanies: function () {
             //Agregar lógica para cargar compañias
+            var oView = this.getView();
+            var oCompaniesModel = new JSONModel();
+
+            fetch("env.json")
+                .then(res => res.json())
+                .then(env => fetch(env.API_COMPANIES_URL_BASE + "GetPricesHistoryBySymbol"))
+                .then(res => res.json())
+                .then(data => {
+                    oCompaniesModel.setData({ companies: data.value });
+                    oView.setModel(oCompaniesModel, "companiesModel");
+                })
+                .catch(err => {
+                    MessageToast.show("Error al cargar compañías: " + err.message);
+                });
         },
 
-        loadDeptos: function(){
+        loadDeptos: function (companyId) {
             //Agregar lógica para cargar deptos según la compañía
+            var oView = this.getView();
+            var oDeptosModel = new JSONModel();
+
+            fetch("env.json")
+                .then(res => res.json())
+                .then(env => fetch(env.API_DEPARTMENTS_URL_BASE + "bycompany" + companyId))
+                .then(res => res.json())
+                .then(data => {
+                    oDeptosModel.setData({ departments: data.value });
+                    oView.setModel(oDeptosModel, "deptosModel");
+                })
+                .catch(err => {
+                    MessageToast.show("Error al cargar departamentos: " + err.message);
+                });
         },
 
 
@@ -85,7 +113,7 @@ sap.ui.define([
                     oRolesModel.setData({ roles: data.value });
                     oView.setModel(oRolesModel);
                 })
-                .catch(err => MessageToast.show("Error al cargar roles: " + err.message));        
+                .catch(err => MessageToast.show("Error al cargar roles: " + err.message));
         },
 
 
@@ -94,8 +122,8 @@ sap.ui.define([
          * Ejemplo: Usuario auxiliar-Investor-etc...
          */
         formatRoles: function (rolesArray) {
-            return Array.isArray(rolesArray) 
-                ? rolesArray.map(role => role.ROLENAME).join("-") 
+            return Array.isArray(rolesArray)
+                ? rolesArray.map(role => role.ROLENAME).join("-")
                 : "";
         },
 
@@ -145,7 +173,7 @@ sap.ui.define([
         /**
          * Función onpress del botón para agregar un nuevo usuario
          */
-        onAddUser : function() {
+        onAddUser: function () {
             var oView = this.getView();
 
             if (!this._oCreateUserDialog) {
@@ -162,14 +190,14 @@ sap.ui.define([
             } else {
                 this._oCreateUserDialog.open();
             }
-            
+
         },
 
-        onSaveUser: function(){
+        onSaveUser: function () {
             //Aquí la lógica para agregar el usuario
         },
 
-        onCancelUser: function(){
+        onCancelUser: function () {
             if (this._oCreateUserDialog) {
                 this._oCreateUserDialog.close();
             }
@@ -183,7 +211,7 @@ sap.ui.define([
          * Función onpress del botón para editar un nuevo usuario
          * Agregar la lógica para cargar la info a la modal
          */
-        onEditUser: function() {
+        onEditUser: function () {
             var oView = this.getView();
 
             if (!this._oEditUserDialog) {
@@ -199,14 +227,14 @@ sap.ui.define([
             } else {
                 this._oEditUserDialog.open();
             }
-            
+
         },
 
-        onEditSaveUser: function(){
+        onEditSaveUser: function () {
             //Aquí la lógica para agregar la info actualizada del usuario en la bd
         },
 
-        onEditCancelUser: function(){
+        onEditCancelUser: function () {
             if (this._oEditUserDialog) {
                 this._oEditUserDialog.close();
             }
@@ -220,7 +248,7 @@ sap.ui.define([
         /**
          * Función onDeleteUser .
          */
-        onDeleteUser: function(){
+        onDeleteUser: function () {
             if (this.selectedUser) {
                 var that = this;
                 MessageBox.confirm("¿Deseas eliminar el usuario con nombre: " + this.selectedUser.USERNAME + "?", {
@@ -232,12 +260,12 @@ sap.ui.define([
                         }
                     }
                 });
-            }else{
+            } else {
                 MessageToast.show("Selecciona un usuario para eliminar de la base de datos");
             }
         },
 
-        deleteUser: function(UserId){
+        deleteUser: function (UserId) {
             // Aqui agregar la lógica para eliminar de la BD
         },
 
@@ -248,7 +276,7 @@ sap.ui.define([
         /**
          * Función onDesactivateUser.
          */
-        onDesactivateUser: function(){
+        onDesactivateUser: function () {
             if (this.selectedUser) {
                 var that = this;
                 MessageBox.confirm("¿Deseas desactivar el usuario con nombre: " + this.selectedUser.USERNAME + "?", {
@@ -260,12 +288,12 @@ sap.ui.define([
                         }
                     }
                 });
-            }else{
+            } else {
                 MessageToast.show("Selecciona un usuario para desactivar");
             }
         },
 
-        desactivateUser: function(UserId){
+        desactivateUser: function (UserId) {
             // Aqui agregar la lógica para desactivar al usuario
         },
 
@@ -277,7 +305,7 @@ sap.ui.define([
         /**
          * Función onActivateUser.
          */
-        onActivateUser: function(){
+        onActivateUser: function () {
             if (this.selectedUser) {
                 var that = this;
                 MessageBox.confirm("¿Deseas activar el usuario con nombre: " + this.selectedUser.USERNAME + "?", {
@@ -289,12 +317,12 @@ sap.ui.define([
                         }
                     }
                 });
-            }else{
+            } else {
                 MessageToast.show("Selecciona un usuario para activar");
             }
         },
 
-        activateUser: function(UserId){
+        activateUser: function (UserId) {
             // Aqui agregar la lógica para activar al usuario
         },
 
@@ -329,7 +357,7 @@ sap.ui.define([
             //Aplicar el filtro de búsqueda para la tabla
         },
 
-        onRefresh: function(){
+        onRefresh: function () {
             this.loadUsers();
         },
 
@@ -338,12 +366,12 @@ sap.ui.define([
         //=========== Validar email y phonenumber ===========
         //===================================================
 
-        isValidEmail: function(email) {
+        isValidEmail: function (email) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return emailRegex.test(email);
         },
 
-        isValidPhoneNumber: function(phone) {
+        isValidPhoneNumber: function (phone) {
             return /^\d{10}$/.test(phone); // Ejemplo: 10 dígitos numéricos
         }
 

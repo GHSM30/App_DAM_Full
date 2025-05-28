@@ -64,7 +64,7 @@ sap.ui.define([
 
             fetch("env.json")
                 .then(res => res.json())
-                .then(env => fetch(env.API_COMPANIES_URL_BASE + "getall"))
+                .then(env => fetch(env.API_COMPANIES_URL_BASE + "GetPricesHistoryBySymbol"))
                 .then(res => res.json())
                 .then(data => {
                     oCompaniesModel.setData({ companies: data.value });

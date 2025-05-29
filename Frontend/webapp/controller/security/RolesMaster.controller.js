@@ -173,8 +173,8 @@ sap.ui.define([
 
     loadRolesData: async function () {
       try {
-        const response = await fetch("http://localhost:3020/api/sec/rolesCRUD?procedure=get&type=all", {
-          method: "POST"
+        const response = await fetch("http://localhost:3020/api/invGetAllRoles", {
+          method: "GET"
         });
         const data = await response.json();
 

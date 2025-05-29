@@ -346,7 +346,7 @@ sap.ui.define(
 
           $.ajax({
             url:
-              "http://localhost:4004/api/sec/logicalLabel?status=" +   //fsdaf
+              "http://localhost:3020/api/sec/logicalLabel?status=" +   //fsdaf
               sAction +
               "&&labelID=" +
               oData.LABELID,
@@ -407,7 +407,7 @@ sap.ui.define(
 
           var sLabelID = oSelectedData.LABELID;
           var sUrl =
-            "http://localhost:4004/api/sec/valuesCRUD?procedure=get&labelID=" +
+            "http://localhost:3020/api/sec/valuesCRUD?procedure=get&labelID=" +
             encodeURIComponent(sLabelID);
           var that = this;
 

@@ -193,8 +193,44 @@ sap.ui.define([
 
         },
 
-        onSaveUser: function () {
+        onSaveUser: async function () {
             //Aquí la lógica para agregar el usuario
+            try {
+                const oView = this.getView();
+                const sUserId = Fragment.byId(oView.getId(), "inputUserId")?.getValue();
+                const sUsername = Fragment.byId(oView.getId(), "inputUsername")?.getValue();
+                const sPhone = Fragment.byId(oView.getId(), "inputUserPhoneNumber")?.getValue();
+                const sEmail = Fragment.byId(oView.getId(), "inputUserEmail")?.getValue();
+                const sBirthday = Fragment.byId(oView.getId(), "inputUserBirthdayDate")?.getDateValue();
+                const sFunction = Fragment.byId(oView.getId(), "inputUserFunction")?.getValue();
+
+                const aRoles = this._extractRolesFromVBox("selectedRolesVBox");
+
+                const oPayload = {
+                    USERID: sUserId,
+                    USERNAME: sUsername,
+                    PHONENUMBER: sPhone,
+                    EMAIL: sEmail,
+                    BIRTHDAYDATE: sBirthday,
+                    FUNCTION: sFunction,
+                    ROLES: aRoles
+                };
+
+                const env = await (await fetch("env.json")).json();
+                await fetch(env.API_USERS_URL_BASE, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(oPayload)
+                });
+
+                MessageToast.show("Usuario creado correctamente");
+                this.loadUsers();
+                this._oCreateUserDialog.close();
+
+            } catch (err) {
+                console.error("Error en onSaveUser:", err);
+                MessageToast.show("Error al crear usuario: " + err.message);
+            }
         },
 
         onCancelUser: function () {
@@ -230,8 +266,37 @@ sap.ui.define([
 
         },
 
-        onEditSaveUser: function () {
+        onEditSaveUser: async function () {
             //Aquí la lógica para agregar la info actualizada del usuario en la bd
+            try {
+                const oView = this.getView();
+                const oDialog = this._oEditUserDialog;
+                const sUsername = Fragment.byId(oView.getId(), "editUsernameInput").getValue();
+                const sEmail = Fragment.byId(oView.getId(), "editEmailInput").getValue();
+                const sPhone = Fragment.byId(oView.getId(), "editPhoneInput").getValue();
+                const aRoles = this._extractRolesFromVBox("selectedEditRolesVBox");
+
+                const oPayload = {
+                    USERID: this.selectedUser.USERID,
+                    USERNAME: sUsername,
+                    EMAIL: sEmail,
+                    PHONE: sPhone,
+                    ROLES: aRoles
+                };
+
+                const env = await (await fetch("env.json")).json();
+                await fetch(env.API_USERS_URL_BASE + oPayload.USERID, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(oPayload)
+                });
+
+                MessageToast.show("Usuario actualizado");
+                this.loadUsers();
+                oDialog.close();
+            } catch (err) {
+                MessageToast.show("Error al editar usuario: " + err.message);
+            }
         },
 
         onEditCancelUser: function () {
@@ -265,8 +330,18 @@ sap.ui.define([
             }
         },
 
-        deleteUser: function (UserId) {
-            // Aqui agregar la lógica para eliminar de la BD
+        deleteUser: async function (UserId) {
+            try {
+                const env = await (await fetch("env.json")).json();
+                await fetch(env.API_USERS_URL_BASE + UserId, {
+                    method: "DELETE"
+                });
+
+                MessageToast.show("Usuario eliminado correctamente");
+                this.loadUsers();
+            } catch (err) {
+                MessageToast.show("Error al eliminar usuario: " + err.message);
+            }
         },
 
         // ===================================================
@@ -293,8 +368,20 @@ sap.ui.define([
             }
         },
 
-        desactivateUser: function (UserId) {
-            // Aqui agregar la lógica para desactivar al usuario
+        desactivateUser: async function (UserId) {
+            //Aquí la lógica para agregar la info actualizada del usuario en la bd
+
+            try {
+                const env = await (await fetch("env.json")).json();
+                await fetch(env.API_USERS_URL_BASE + UserId + "/deactivate", {
+                    method: "POST"
+                });
+
+                MessageToast.show("Usuario desactivado");
+                this.loadUsers();
+            } catch (err) {
+                MessageToast.show("Error al desactivar usuario: " + err.message);
+            }
         },
 
 
@@ -322,8 +409,19 @@ sap.ui.define([
             }
         },
 
-        activateUser: function (UserId) {
+        activateUser: async function (UserId) {
             // Aqui agregar la lógica para activar al usuario
+            try {
+                const env = await (await fetch("env.json")).json();
+                await fetch(env.API_USERS_URL_BASE + UserId + "/activate", {
+                    method: "POST"
+                });
+
+                MessageToast.show("Usuario activado");
+                this.loadUsers();
+            } catch (err) {
+                MessageToast.show("Error al activar usuario: " + err.message);
+            }
         },
 
 
@@ -353,12 +451,30 @@ sap.ui.define([
             this.getView().getModel("viewModel").setProperty("/buttonsEnabled", true);
         },
 
-        onSearchUser: function () {
+        onSearchUser: function (oEvent) {
             //Aplicar el filtro de búsqueda para la tabla
+            const sQuery = oEvent.getSource().getValue().toLowerCase();
+            const oTable = this.byId("IdTable1UsersManageTable");
+            const oBinding = oTable.getBinding("rows");
+
+            oBinding.filter(new sap.ui.model.Filter({
+                filters: [
+                    new sap.ui.model.Filter("USERNAME", sap.ui.model.FilterOperator.Contains, sQuery),
+                    new sap.ui.model.Filter("EMAIL", sap.ui.model.FilterOperator.Contains, sQuery)
+                ],
+                and: false
+            }));
         },
 
         onRefresh: function () {
             this.loadUsers();
+        },
+
+        _extractRolesFromVBox: function (vboxId) {
+            const oVBox = this.getView().byId(vboxId);
+            return oVBox.getItems().map(oItem => {
+                return { ROLEID: oItem.data("roleId") };
+            });
         },
 
 

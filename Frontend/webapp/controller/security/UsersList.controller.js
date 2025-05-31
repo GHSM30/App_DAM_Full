@@ -197,6 +197,7 @@ sap.ui.define([
             //Aquí la lógica para agregar el usuario
             try {
                 const oView = this.getView();
+
                 const sUserId = Fragment.byId(oView.getId(), "inputUserId")?.getValue();
                 const sUsername = Fragment.byId(oView.getId(), "inputUsername")?.getValue();
                 const sPhone = Fragment.byId(oView.getId(), "inputUserPhoneNumber")?.getValue();
@@ -206,6 +207,7 @@ sap.ui.define([
 
                 const aRoles = this._extractRolesFromVBox("selectedRolesVBox");
 
+                // Arma el payload según lo que espera la acción CreateUser
                 const oPayload = {
                     USERID: sUserId,
                     USERNAME: sUsername,
@@ -217,11 +219,16 @@ sap.ui.define([
                 };
 
                 const env = await (await fetch("env.json")).json();
-                await fetch(env.API_USERS_URL_BASE, {
+
+                const response = await fetch(env.API_CREATE_USER, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(oPayload)
+                    body: JSON.stringify({ user: oPayload })  // ← acción CreateUser espera { user: { ... } }
                 });
+
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
 
                 MessageToast.show("Usuario creado correctamente");
                 this.loadUsers();
